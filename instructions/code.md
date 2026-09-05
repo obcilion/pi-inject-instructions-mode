@@ -1,5 +1,6 @@
 # Code Mode
-Coding mode is active, use when writing code. Additional instructions:
+Coding mode is active. 
+Additional instructions:
 
 - Simple is better than anything else
 - Build the absolutely simplest implementation possible
