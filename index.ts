@@ -18,6 +18,12 @@ function loadInstructions(): string {
 
 function publishMode(pi: ExtensionAPI) {
   pi.on("session_start", (_event, ctx) => {
+    // Restore the most recent mode stored with this session.
+    for (const entry of ctx.sessionManager.getEntries()) {
+      if (entry.type === "custom" && entry.customType === "mode") {
+        mode = typeof entry.data?.mode === "string" ? entry.data.mode : null;
+      }
+    }
     ctx.ui.setStatus("mode", `mode: ${mode ?? "base"}`);
   });
 }
@@ -65,6 +71,7 @@ export default function (pi: ExtensionAPI) {
       }
       if (name === "base") {
         mode = null;
+        pi.appendEntry("mode", { mode });
         ctx.ui.notify("Mode: base", "info");
         ctx.ui.setStatus("mode", "mode: base");
         return;
@@ -74,6 +81,7 @@ export default function (pi: ExtensionAPI) {
         return;
       }
       mode = name;
+      pi.appendEntry("mode", { mode });
       ctx.ui.notify(`Mode: ${name}`, "info");
       ctx.ui.setStatus("mode", `mode: ${name}`);
     },
