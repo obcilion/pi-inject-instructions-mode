@@ -1,5 +1,6 @@
+import type { AutocompleteItem } from "@earendil-works/pi-tui";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -38,6 +39,16 @@ export default function (pi: ExtensionAPI) {
 
   pi.registerCommand("mode", {
     description: "Switch instruction mode (/mode name, /mode base, /mode to show current)",
+    getArgumentCompletions: (prefix: string): AutocompleteItem[] | null => {
+      const modes = [
+        "base",
+        ...readdirSync(join(__dirname, "instructions"))
+          .filter((f) => f.endsWith(".md") && f !== "base.md")
+          .map((f) => f.slice(0, -3)),
+      ];
+      const filtered = modes.filter((m) => m.startsWith(prefix));
+      return filtered.length > 0 ? filtered.map((m) => ({ value: m, label: m })) : null;
+    },
     handler: async (args, ctx) => {
       const name = args.trim();
       if (!name) {
