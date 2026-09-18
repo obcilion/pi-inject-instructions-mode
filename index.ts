@@ -16,7 +16,15 @@ function loadInstructions(): string {
   return instructions;
 }
 
+function publishMode(pi: ExtensionAPI) {
+  pi.on("session_start", (_event, ctx) => {
+    ctx.ui.setStatus("mode", `mode: ${mode ?? "base"}`);
+  });
+}
+
 export default function (pi: ExtensionAPI) {
+  publishMode(pi);
+
   pi.on("context", async (event) => {
     const instructions = loadInstructions();
 
@@ -58,6 +66,7 @@ export default function (pi: ExtensionAPI) {
       if (name === "base") {
         mode = null;
         ctx.ui.notify("Mode: base", "info");
+        ctx.ui.setStatus("mode", "mode: base");
         return;
       }
       if (!existsSync(join(__dirname, "instructions", `${name}.md`))) {
@@ -66,6 +75,7 @@ export default function (pi: ExtensionAPI) {
       }
       mode = name;
       ctx.ui.notify(`Mode: ${name}`, "info");
+      ctx.ui.setStatus("mode", `mode: ${name}`);
     },
   });
 }
